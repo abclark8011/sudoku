@@ -79,7 +79,7 @@ print(data) {
 
 // The solver.  Recursively tries all possible solutions.
 function
-solve(data, row, col) {
+solve(data, row = 0, col = 0) {
   if (row == 9) return true;
 
   var val = data[row][col];
@@ -98,7 +98,7 @@ solve(data, row, col) {
   return false;
 }
 
-if (solve(puzzle, 0, 0)) {  
+if (solve(puzzle)) {  
   console.log("Solution:");
   print(puzzle);
 } else {
