@@ -4,6 +4,92 @@
 // The puzzle is filled out with correct values and returned back.
 
 
+
+class Puzzle {
+  constructor(puzzle = [[]]) {
+    this.puzzle = puzzle;
+  }
+
+  get puzzle() {
+    return this._puzzle;
+  }
+
+  set puzzle(data) {
+    this._puzzle = data;
+    this.ROWS = this.puzzle.length;
+    this.COLS = this.puzzle[0].length;
+  }
+
+  getValue(row, col) {
+    return this.puzzle[row][col];
+  }
+
+  setValue(row, col, value) {
+    this.puzzle[row][col] = value;
+  }
+
+  // Functions to convert from 1D index to 2D coords.
+  // Used to traverse all cells in a block.
+  row2D(id, offset)  {
+    return 3 * Math.floor(id / 3) + Math.floor(offset / 3);
+  }
+
+  col2D(id, offset) {
+    return 3 * Math.floor(id / 3) + offset % 3;
+  }
+
+  // Calulcate the next row and column
+  nextRow(row, col)  {
+    return Math.floor((9 * row + col + 1) / 9);
+  }
+
+  nextCol(row, col)  {
+    return (9 * row + col + 1) % 9;
+  }
+
+
+  // Given a possible value for a row/col location, check if
+  // that value will violate the basic Sudoku rules.
+  isValid(row, col, value) {
+    for (var i = 0; i < 9; i++) {
+      if (this.getValue(row, i) == value) return false;
+      if (this.getValue(i, col) == value) return false;
+      if (this.getValue(this.row2D(row, i), this.col2D(col, i)) == value) return false;
+    }
+    return true;
+  }
+
+  // Function to print out the puzzle.
+  print() {
+    for (var i = 0; i < 9; i++) {
+      for (var j = 0; j < 9; j++) {
+        process.stdout.write(this.getValue(i, j).toString());
+      }
+      console.log("");
+    }
+  }
+
+  // The solver.  Recursively tries all possible solutions.
+  solve(row = 0, col = 0) {
+    if (row == 9) return true;
+
+    var val = this.getValue(row, col);
+
+    // If there's a value, then it came from the inital puzzle.  Skip it.
+    if (val) return this.solve(this.nextRow(row, col), this.nextCol(row, col));
+
+    // Try all 9 possible values
+    for (var i = 1; i <= 9; i++) {
+      if (this.isValid(row, col, i)) {
+        this.setValue(row, col, i);
+        if (this.solve(this.nextRow(row, col), this.nextCol(row, col))) return true;
+      }
+    }
+    this.setValue(row, col, val); // Restore original value
+    return false;
+  }
+}
+
 // A sample puzzle.  Could extend the app to read puzzle from stdin.
 var puzzle = [
     // Allegedly the hardest known Sudoku puzzle
@@ -34,73 +120,11 @@ var puzzle = [
 ];
 */
 
-// Functions to convert from 1D index to 2D coords.
-// Used to traverse all cells in a block.
-function RTB(id, offset)  {
-  return 3 * Math.floor(id / 3) + Math.floor(offset / 3);
-}
+var p = new Puzzle(puzzle);
 
-function CTB(id, offset) {
-  return 3 * Math.floor(id / 3) + offset % 3;
-}
-
-// Calulcate the next row and column
-function NEXT_ROW(row, col)  {
-  return Math.floor((9 * row + col + 1) / 9);
-}
-
-function NEXT_COL(row, col)  {
-  return (9 * row + col + 1) % 9;
-}
-
-
-// Given a possible value for a row/col location, check if
-// that value will violate the basic Sudoku rules.
-function
-isValid(data, row, col, value) {
-  for (var i = 0; i < 9; i++) {
-    if (data[row][i] == value) return false;
-    if (data[i][col] == value) return false;
-    if (data[RTB(row, i)][CTB(col, i)] == value) return false;
-  }
-  return true;
-}
-
-// Function to print out the puzzle.
-function
-print(data) {
-  for (var i = 0; i < 9; i++) {
-    for (var j = 0; j < 9; j++) {
-      process.stdout.write(data[i][j].toString());
-    }
-    console.log("");
-  }
-}
-
-// The solver.  Recursively tries all possible solutions.
-function
-solve(data, row = 0, col = 0) {
-  if (row == 9) return true;
-
-  var val = data[row][col];
-
-  // If there's a value, then it came from the inital puzzle.  Skip it.
-  if (val) return solve(data, NEXT_ROW(row, col), NEXT_COL(row, col));
-
-  // Try all 9 possible values
-  for (var i = 1; i <= 9; i++) {
-    if (isValid(data, row, col, i)) {
-      data[row][col] = i;
-      if (solve(data, NEXT_ROW(row, col), NEXT_COL(row, col))) return true;
-    }
-  }
-  data[row][col] = val; // Restore original value
-  return false;
-}
-
-if (solve(puzzle)) {  
+if (p.solve()) {  
   console.log("Solution:");
-  print(puzzle);
+  p.print();
 } else {
   console.log("Unsolvable!");
 }
