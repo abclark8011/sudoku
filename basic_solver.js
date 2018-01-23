@@ -51,7 +51,7 @@ class Puzzle {
   // Given a possible value for a row/col location, check if
   // that value will violate the basic Sudoku rules.
   isValid(row, col, value) {
-    for (var i = 0; i < 9; i++) {
+    for (var i = 0; i < this.ROWS; i++) {
       if (this.getValue(row, i) == value) return false;
       if (this.getValue(i, col) == value) return false;
       if (this.getValue(this.row2D(row, i), this.col2D(col, i)) == value) return false;
@@ -61,8 +61,8 @@ class Puzzle {
 
   // Function to print out the puzzle.
   print() {
-    for (var i = 0; i < 9; i++) {
-      for (var j = 0; j < 9; j++) {
+    for (var i = 0; i < this.ROWS; i++) {
+      for (var j = 0; j < this.COLS; j++) {
         process.stdout.write(this.getValue(i, j).toString());
       }
       console.log("");
@@ -71,7 +71,7 @@ class Puzzle {
 
   // The solver.  Recursively tries all possible solutions.
   solve(row = 0, col = 0) {
-    if (row == 9) return true;
+    if (row == this.ROWS) return true;
 
     var val = this.getValue(row, col);
 
