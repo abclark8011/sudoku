@@ -36,34 +36,41 @@ class Sudoku {
   }
 
   // The solver.  Recursively tries all possible solutions.
-  solve(row = 0, col = 0) {
-    if (row == this.puzzle.ROWS) {
+  solve(coord = new RC(0, 0)) {
+    if (coord.eof) {
       this.addSolution();
       return true;
     }
 
-    let nextRow = this.puzzle.nextRow(row, col),
-        nextCol = this.puzzle.nextCol(row, col);
+    let nextCell = this.puzzle.nextRowCol(coord);
 
     // If there's a value, then it came from the inital puzzle.  Skip it.
-    if (this.puzzle.getValue(row, col)) {
-      return this.solve(nextRow, nextCol);
+    if (this.puzzle.getValue(coord)) {
+      return this.solve(nextCell);
     }
 
     // Try all 9 possible values
     for (let value = 1; value <= 9; value++) {
-      if (this.puzzle.isValid(row, col, value)) {
-        this.puzzle.setValue(row, col, value);
-        if (this.solve(nextRow, nextCol)) {
+      if (this.puzzle.isValid(coord, value)) {
+        this.puzzle.setValue(coord, value);
+        if (this.solve(nextCell)) {
           if (!this.exhaustive) return true;
         }
       }
     }
-    this.puzzle.setValue(row, col, 0); // Restore original value
+    this.puzzle.setValue(coord, 0); // Restore original value
     return false;
   }
 };
 
+
+class RC { // Row/Column coordinate class
+  constructor(row, col) {
+    this.eof = row < 0 || row >=9 || col < 0 || col >= 9;
+    this.row = row;
+    this.col = col;
+  }
+}
 
 class Puzzle {
   constructor(puzzle = [[]]) {
@@ -83,12 +90,12 @@ class Puzzle {
     this.COLS = this.puzzle[0].length;
   }
 
-  getValue(row, col) {
-    return this.puzzle[row][col];
+  getValue(coord) {
+    return this.puzzle[coord.row][coord.col];
   }
 
-  setValue(row, col, value) {
-    this.puzzle[row][col] = value;
+  setValue(coord, value) {
+    this.puzzle[coord.row][coord.col] = value;
   }
 
   // Functions to convert from 1D index to 2D coords.
@@ -102,22 +109,28 @@ class Puzzle {
   }
 
   // Calulcate the next row and column
-  nextRow(row, col)  {
-    return Math.floor((9 * row + col + 1) / 9);
+  nextRow(coord)  {
+    return Math.floor((9 * coord.row + coord.col + 1) / 9);
   }
 
-  nextCol(row, col)  {
-    return (9 * row + col + 1) % 9;
+  nextCol(coord)  {
+    return (9 * coord.row + coord.col + 1) % 9;
   }
 
+  nextRowCol(coord) {
+    return new RC(this.nextRow(coord), this.nextCol(coord));
+  }
 
   // Given a possible value for a row/col location, check if
   // that value will violate the basic Sudoku rules.
-  isValid(row, col, value) {
+  isValid(coord, value) {
     for (let i = 0; i < this.ROWS; i++) {
-      if (this.getValue(row, i) == value) return false;
-      if (this.getValue(i, col) == value) return false;
-      if (this.getValue(this.row2D(row, i), this.col2D(col, i)) == value) return false;
+      let c = new RC(coord.row, i);
+      if (this.getValue(c) == value) return false;
+      c = new RC(i, coord.col);
+      if (this.getValue(c) == value) return false;
+      c = new RC(this.row2D(coord.row, i), this.col2D(coord.col, i));
+      if (this.getValue(c) == value) return false;
     }
     return true;
   }
@@ -126,7 +139,8 @@ class Puzzle {
   print() {
     for (let i = 0; i < this.ROWS; i++) {
       for (let j = 0; j < this.COLS; j++) {
-        process.stdout.write(this.getValue(i, j).toString());
+        let coord = new RC(i, j);
+        process.stdout.write(this.getValue(coord).toString());
       }
       console.log("");
     }
