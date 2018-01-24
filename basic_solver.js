@@ -64,11 +64,17 @@ class Sudoku {
 };
 
 
-class RC { // Row/Column coordinate class
+class Coord {
   constructor(row, col) {
-    this.eof = row < 0 || row >=9 || col < 0 || col >= 9;
     this.row = row;
     this.col = col;
+  }
+};
+
+class RC extends Coord { // Row/Column coordinate class
+  constructor(row, col) {
+    super(row, col);
+    this.eof = row < 0 || row >=9 || col < 0 || col >= 9;
   }
 }
 
