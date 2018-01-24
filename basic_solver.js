@@ -8,20 +8,12 @@
 class Sudoku {
   constructor(puzzle) {
     this.puzzle = new Puzzle(puzzle);
-    this._solution = [];
+    this.solution = [];
     this.exhaustive = true;
   }
 
-  solutionCount() {
-    return this._solution.length;
-  }
-
-  getSolution(idx = 0) {
-    return this._solution[idx];
-  }
-
   addSolution() {
-    this._solution.push(new Puzzle(this.puzzle._puzzle));
+    this.solution.push(new Puzzle(this.puzzle._puzzle));
   }
 
   set exhaustive(value) {
@@ -210,10 +202,10 @@ var puzzle = [
 var sudoku = new Sudoku(puzzle2Solutions);
 
 sudoku.solve();
-if (sudoku.solutionCount() > 0) {  
+if (sudoku.solution.length) {  
   console.log("Solution:");
-  for (let i = 0; i < sudoku.solutionCount(); i++) {
-    sudoku.getSolution(i).print();
+  for (let solution of sudoku.solution) {
+    solution.print();
   }
 } else {
   console.log("Unsolvable!");
