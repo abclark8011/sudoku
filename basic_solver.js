@@ -1,7 +1,8 @@
 // Program to solve any Sudoku puzzle by brute force. The actual
 // code is only about 30 lines.
-// The user calls the "solve" function and passes in a 9x9 puzzle.
-// The puzzle is filled out with correct values and returned back.
+// The user creates a Sudoku object by passing in the 9x9
+// data grid.  Then the user calls the "solve" function.
+// The solution(s) are stored as Puzzles in the Sudoku object.
 
 
 class Sudoku {
