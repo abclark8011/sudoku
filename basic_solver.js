@@ -4,10 +4,15 @@
 // The puzzle is filled out with correct values and returned back.
 
 
+var solutionList = [];
 
 class Puzzle {
-  constructor(puzzle = [[]]) {
-    this.puzzle = puzzle;
+  constructor(puzzle = [[]], copy = false) {
+    if (!copy) {
+      this.puzzle = puzzle;
+    } else {
+      this,puzzle = puzzle.slice();
+    }
   }
 
   get puzzle() {
@@ -71,7 +76,10 @@ class Puzzle {
 
   // The solver.  Recursively tries all possible solutions.
   solve(row = 0, col = 0) {
-    if (row == this.ROWS) return true;
+    if (row == this.ROWS) {
+      solutionList.push(new Puzzle(this.puzzle));
+      return true;
+    }
 
     // If there's a value, then it came from the inital puzzle.  Skip it.
     if (this.getValue(row, col)) {
@@ -126,7 +134,7 @@ var p = new Puzzle(puzzle);
 
 if (p.solve()) {  
   console.log("Solution:");
-  p.print();
+  solutionList[0].print();
 } else {
   console.log("Unsolvable!");
 }
