@@ -5,37 +5,9 @@
 
 #include <stdio.h>
 #include <memory.h>
+#include <malloc.h>
 
 int solved = 0;   // global to keep track if puzzle has been solved
-
-// A sample puzzle.  Could extend the app to read puzzle from stdin.
-int puzzle[9][9] = {
-    // Allegedly the hardest known Sudoku puzzle
-    { 8, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 3, 6, 0, 0, 0, 0, 0 },
-    { 0, 7, 0, 0, 9, 0, 2, 0, 0 },
-    { 0, 5, 0, 0, 0, 7, 0, 0, 0 },
-    { 0, 0, 0, 0, 4, 5, 7, 0, 0 },
-    { 0, 0, 0, 1, 0, 0, 0, 3, 0 },
-    { 0, 0, 1, 0, 0, 0, 0, 6, 8 },
-    { 0, 0, 8, 5, 0, 0, 0, 1, 0 },
-    { 0, 9, 0, 0, 0, 0, 4, 0, 0 }
-};
-
-/*
-int solution[9][9] = {
-    // Solution to the hardest puzzle
-    { 8, 1, 2, 7, 5, 3, 6, 4, 9 },
-    { 9, 4, 3, 6, 8, 2, 1, 7, 5 }, 
-    { 6, 7, 5, 4, 9, 1, 2, 8, 3 }, 
-    { 1, 5, 4, 2, 3, 7, 8, 9, 6 }, 
-    { 3, 6, 9, 8, 4, 5, 7, 2, 1 }, 
-    { 2, 8, 7, 1, 6, 9, 5, 3, 4 }, 
-    { 5, 2, 1, 9, 7, 4, 3, 6, 8 }, 
-    { 4, 3, 8, 5, 2, 6, 9, 1, 7 }, 
-    { 7, 9, 6, 3, 1, 8, 4, 5, 2 } 
-};
-*/
 
 // Functions to convert from 1D index to 2D coords.
 // Used to traverse all cells in a block.
@@ -91,8 +63,33 @@ solve(int data[9][9], int row, int col) {
   }
 }
 
+// Need some error handling in case bad input is provided, like:
+//   * Not enough data
+//   * Too much data
+//   * Not enough data in a line
+//   * An invalid number
+//
+void
+puzzleRead(int puzzle[][9]) {
+  char *line = NULL;
+  size_t len = 0;
+  ssize_t read;
+  int lineNum = 0;
+
+  while ((read = getline(&line, &len, stdin)) != -1) {
+    for (int i = 0; i < read && i < 9 && line[i] != '\n'; i++) {
+      puzzle[lineNum][i] = line[i] - '0';
+    }
+    lineNum++;
+  }
+  free(line);
+}
+
 int
 main() {
+  int puzzle[9][9];
+
+  puzzleRead(puzzle);
   solve(puzzle, 0, 0);
   if (solved) {
     printf("Solved!\n");

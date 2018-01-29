@@ -146,67 +146,18 @@ class Puzzle {
   }
 }
 
-// A sample puzzle.  Could extend the app to read puzzle from stdin.
-var puzzle = [
-    // Allegedly the hardest known Sudoku puzzle
-    [ 8, 0, 0, 0, 0, 0, 0, 0, 0 ],
-    [ 0, 0, 3, 6, 0, 0, 0, 0, 0 ],
-    [ 0, 7, 0, 0, 9, 0, 2, 0, 0 ],
-    [ 0, 5, 0, 0, 0, 7, 0, 0, 0 ],
-    [ 0, 0, 0, 0, 4, 5, 7, 0, 0 ],
-    [ 0, 0, 0, 1, 0, 0, 0, 3, 0 ],
-    [ 0, 0, 1, 0, 0, 0, 0, 6, 8 ],
-    [ 0, 0, 8, 5, 0, 0, 0, 1, 0 ],
-    [ 0, 9, 0, 0, 0, 0, 4, 0, 0 ]
-];
-var puzzle2Solutions = [
-    // A puzzle with 2 solutions
-    [ 9, 0, 6, 0, 7, 0, 4, 0, 3 ],
-    [ 0, 0, 0, 4, 0, 0, 2, 0, 0 ],
-    [ 0, 7, 0, 0, 2, 3, 0, 1, 0 ],
-    [ 5, 0, 0, 0, 0, 0, 1, 0, 0 ],
-    [ 0, 4, 0, 2, 0, 8, 0, 6, 0 ],
-    [ 0, 0, 3, 0, 0, 0, 0, 0, 5 ],
-    [ 0, 3, 0, 7, 0, 0, 0, 5, 0 ],
-    [ 0, 0, 7, 0, 0, 5, 0, 0, 0 ],
-    [ 4, 0, 5, 0, 1, 0, 7, 0, 8 ]
-];
+var puzzleIO = require('./puzzleIO');
 
-var puzzle1Sol = [
-    // Solution to the hardest puzzle
-    [ 8, 1, 2, 7, 5, 3, 6, 4, 9 ],
-    [ 9, 4, 3, 6, 8, 2, 1, 7, 5 ], 
-    [ 6, 7, 5, 4, 9, 1, 2, 8, 3 ], 
-    [ 1, 5, 4, 2, 3, 7, 8, 9, 6 ], 
-    [ 3, 6, 9, 8, 4, 5, 7, 2, 1 ], 
-    [ 2, 8, 7, 1, 6, 9, 5, 3, 4 ], 
-    [ 5, 2, 1, 9, 7, 4, 3, 6, 8 ], 
-    [ 4, 3, 8, 5, 2, 6, 9, 1, 7 ], 
-    [ 7, 9, 6, 3, 1, 8, 4, 5, 0 ] 
-];
-/*
-var puzzle = [
-    // Solution to the hardest puzzle
-    [ 8, 1, 2, 7, 5, 3, 6, 4, 9 ],
-    [ 9, 4, 3, 6, 8, 2, 1, 7, 5 ], 
-    [ 6, 7, 5, 4, 9, 1, 2, 8, 3 ], 
-    [ 1, 5, 4, 2, 3, 7, 8, 9, 6 ], 
-    [ 3, 6, 9, 8, 4, 5, 7, 2, 1 ], 
-    [ 2, 8, 7, 1, 6, 9, 5, 3, 4 ], 
-    [ 5, 2, 1, 9, 7, 4, 3, 6, 8 ], 
-    [ 4, 3, 8, 5, 2, 6, 9, 1, 7 ], 
-    [ 7, 9, 6, 3, 1, 8, 4, 5, 2 ]
-];
-*/
+puzzleIO.puzzleReader.then(data => {
+  var sudoku = new Sudoku(data);
 
-var sudoku = new Sudoku(puzzle2Solutions);
-
-sudoku.solve();
-if (sudoku.solution.length) {  
-  console.log("Solution:");
-  for (let solution of sudoku.solution) {
-    solution.print();
+  sudoku.solve();
+  if (sudoku.solution.length) {  
+    console.log("Solution:");
+    for (let solution of sudoku.solution) {
+      solution.print();
+    }
+  } else {
+    console.log("Unsolvable!");
   }
-} else {
-  console.log("Unsolvable!");
-}
+});
