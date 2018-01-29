@@ -153,7 +153,7 @@ class Puzzle {
   }
 }
 
-var puzzleIO = require('./puzzleIO');
+const puzzleIO = require('./puzzleIO');
 
 puzzleIO.puzzleReader
   .then(data => {
