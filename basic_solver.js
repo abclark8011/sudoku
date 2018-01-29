@@ -12,6 +12,13 @@ class Sudoku {
     this.exhaustive = true;
   }
 
+  printSolutions() {
+    for (let solution of this.solution) {
+      solution.print();
+    }
+  }
+
+
   addSolution() {
     this.solution.push(new Puzzle(this.puzzle._puzzle));
   }
@@ -150,16 +157,9 @@ var puzzleIO = require('./puzzleIO');
 
 puzzleIO.puzzleReader
   .then(data => {
-    var sudoku = new Sudoku(data);
+    let sudoku = new Sudoku(data);
 
     sudoku.solve();
-    if (sudoku.solution.length) {  
-      console.log("Solution:");
-      for (let solution of sudoku.solution) {
-        solution.print();
-      }
-    } else {
-      console.log("Unsolvable!");
-    }
+    sudoku.printSolutions();
   })
   .catch(error => console.log(error));
