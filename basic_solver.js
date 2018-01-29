@@ -41,7 +41,7 @@ class Sudoku {
       return true;
     }
 
-    let nextCell = this.puzzle.nextRowCol(coord);
+    const nextCell = this.puzzle.nextRowCol(coord);
 
     // If there's a value, then it came from the inital puzzle.  Skip it.
     if (this.puzzle.getValue(coord)) {
@@ -144,7 +144,7 @@ class Puzzle {
   print() {
     for (let i = 0; i < this.ROWS; i++) {
       for (let j = 0; j < this.COLS; j++) {
-        let coord = new RC(i, j);
+        const coord = new RC(i, j);
         process.stdout.write(this.getValue(coord).toString());
       }
       console.log("");
@@ -157,7 +157,7 @@ const puzzleIO = require('./puzzleIO');
 
 puzzleIO.puzzleReader
   .then(data => {
-    let sudoku = new Sudoku(data);
+    const sudoku = new Sudoku(data);
 
     sudoku.solve();
     sudoku.printSolutions();
