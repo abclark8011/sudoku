@@ -6,7 +6,7 @@
 //
 const readline = require('readline');
 
-let puzzleReader = new Promise(function(resolve, reject) {
+let puzzleReader = new Promise((resolve, reject) => {
   let lineNum = 0;
   let data = [[]];
   for (let i = 0; i < 9; i++) {
