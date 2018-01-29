@@ -14,23 +14,20 @@ let puzzleReader = new Promise(function(resolve, reject) {
   }
 
   const rl = readline.createInterface({
-    input: process.stdin,
+    input : process.stdin,
     output: process.stdout
   });
 
   rl.on('line', (line) => {
-    //console.log(`You typed ${line}`);
     for (let c of line) {
       data[lineNum].push(Number(c));
     }
-    if (++lineNum == 9) {
+    if (++lineNum == 9) {   // too many lines, quit reading
       rl.close();
-      resolve(data);
     }
   }).on('close', () => {
-    rl.close();
-    if (lineNum <= 8) {
-      reject("Not enough lines read");
+    if (lineNum != 9) {
+      reject("Incorrect number of lines");
     } else {
       resolve(data);
     }

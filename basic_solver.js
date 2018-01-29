@@ -148,16 +148,18 @@ class Puzzle {
 
 var puzzleIO = require('./puzzleIO');
 
-puzzleIO.puzzleReader.then(data => {
-  var sudoku = new Sudoku(data);
+puzzleIO.puzzleReader
+  .then(data => {
+    var sudoku = new Sudoku(data);
 
-  sudoku.solve();
-  if (sudoku.solution.length) {  
-    console.log("Solution:");
-    for (let solution of sudoku.solution) {
-      solution.print();
+    sudoku.solve();
+    if (sudoku.solution.length) {  
+      console.log("Solution:");
+      for (let solution of sudoku.solution) {
+        solution.print();
+      }
+    } else {
+      console.log("Unsolvable!");
     }
-  } else {
-    console.log("Unsolvable!");
-  }
-});
+  })
+  .catch(error => console.log(error));
