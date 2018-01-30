@@ -24,7 +24,7 @@ class Sudoku {
   }
 
   set exhaustive(value) {
-    if (typeof(value) != typeof(true)) {
+    if (typeof value !== typeof true) {
       throw 'expected boolean value';
     }
     this._exhaustive = value;
@@ -60,7 +60,7 @@ class Sudoku {
     this.puzzle.setValue(coord, 0); // Restore original value
     return false;
   }
-};
+}
 
 
 class Coord {
@@ -68,7 +68,7 @@ class Coord {
     this.row = row;
     this.col = col;
   }
-};
+}
 
 class RC extends Coord { // Row/Column coordinate class
   constructor(row, col) {
@@ -131,11 +131,11 @@ class Puzzle {
   isValid(coord, value) {
     for (let i = 0; i < this.ROWS; i++) {
       let c = new RC(coord.row, i);
-      if (this.getValue(c) == value) return false;
+      if (this.getValue(c) === value) return false;
       c = new RC(i, coord.col);
-      if (this.getValue(c) == value) return false;
+      if (this.getValue(c) === value) return false;
       c = new RC(this.row2D(coord.row, i), this.col2D(coord.col, i));
-      if (this.getValue(c) == value) return false;
+      if (this.getValue(c) === value) return false;
     }
     return true;
   }
@@ -154,7 +154,7 @@ class Puzzle {
 }
 
 const puzzleIO = require('./puzzleIO');
-
+//
 puzzleIO.puzzleReader
   .then(data => {
     const sudoku = new Sudoku(data);

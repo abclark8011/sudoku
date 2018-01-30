@@ -1,5 +1,5 @@
 // Program to solve any Sudoku puzzle by brute force. The actual
-// code is only about 40 lines.
+// code is only about 40 lines!
 // The user calls the "solve" function and passes in a 9x9 puzzle.
 // The puzzle is filled out with correct values and returned back.
 
