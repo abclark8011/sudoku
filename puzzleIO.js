@@ -8,7 +8,7 @@ const readline = require('readline');
 
 function puzzleReader(args = []) {
     const promise = new Promise((resolve, reject) => {
-        const data = [[]];
+        const data = [];
         //for (let i = 0; i < 9; i++) {
          //   data[i] = [];
         //}
@@ -60,6 +60,5 @@ module.exports = {
   puzzleReader: puzzleReader
 };
 
-//puzzleReader
-//  .then(result => console.log(result))
-//  .then(result => console.log("here!"));
+// Just to test if it works.
+puzzleReader(['data/hardest.txt']);
