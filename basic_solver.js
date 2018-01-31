@@ -154,8 +154,8 @@ class Puzzle {
 }
 
 const puzzleIO = require('./puzzleIO');
-//
-puzzleIO.puzzleReader
+//puzzleIO.puzzleReader(process.argv.slice(2))
+puzzleIO.puzzleReader(['data/hardest.txt'])
   .then(data => {
     const sudoku = new Sudoku(data);
 
