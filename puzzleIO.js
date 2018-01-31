@@ -1,10 +1,9 @@
-// Read 9 lines of 9 numbers and return a 9x9 array.
-// Error checking could be improved - as far as the data format.
+// Read lines of numbers and return a 2D array of the data.
+// The caller must deal with bad input (e.g. too much/little data).
 //
 // This module creates a Promise object, so that the caller
 // can call it asynchronously and wait for it complete.
 //
-const readline = require('readline');
 
 function puzzleReader(args = []) {
     const promise = new Promise((resolve, reject) => {
@@ -12,39 +11,27 @@ function puzzleReader(args = []) {
 
         // Default reading from stdin.  If a file name was passed in,
         // then try to open it and read from it instead.
-        let inputFS = process.stdin;
+        let inputFH = process.stdin;
         if (args.length > 0) {
-            inputFS = require('fs').createReadStream(args[0]);
-            inputFS.on('error', () => {
-                inputFS.close();
-                reject(`error opening data file: ${args[0]}`);
-            })
+            inputFH = require('fs').createReadStream(args[0])
+                .on('error', () => {
+                    inputFH.close();
+                    reject(`error opening data file: ${args[0]}`);
+                })
         }
 
         // Create the read interface and read the input data.
-        const rl = readline.createInterface({
-            input: inputFS,
+        const rl = require('readline').createInterface({
+            input: inputFH,
             output: process.stdout
         });
 
         // Read the data.  Handle lines of data, closing the
         // stream, and errors reading from the stream.
-        let lineNum = 0;
         rl.on('line', (line) => {
-            data.push(new Array());
-            // TODO: Handle lines too long or invalid data values
-            for (let c of line) {
-                data[lineNum].push(Number(c));
-            }
-            if (++lineNum == 9) {   // too many lines, quit reading
-                rl.close();
-            }
+            data.push(line.split('').map(x => Number(x)));
         }).on('close', () => {
-            if (lineNum != 9) {
-                reject("Incorrect number of lines");
-            } else {
-                resolve(data);
-            }
+            resolve(data);
         }).on('error', () => {
             reject('Error reading from data file');
         });
@@ -54,7 +41,7 @@ function puzzleReader(args = []) {
 
 // Export just the puzzleReader function.
 module.exports = {
-  puzzleReader: puzzleReader
+    puzzleReader: puzzleReader
 };
 
 // Just to test if it works.
