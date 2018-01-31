@@ -9,9 +9,6 @@ const readline = require('readline');
 function puzzleReader(args = []) {
     const promise = new Promise((resolve, reject) => {
         const data = [];
-        //for (let i = 0; i < 9; i++) {
-         //   data[i] = [];
-        //}
 
         // Default reading from stdin.  If a file name was passed in,
         // then try to open it and read from it instead.
