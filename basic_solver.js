@@ -34,8 +34,13 @@ class Sudoku {
     return this._exhaustive;
   }
 
-  // The solver.  Recursively tries all possible solutions.
   solve(coord = new RC(0, 0)) {
+      this._solve(coord);
+      return this;
+  }
+
+  // The solver.  Recursively tries all possible solutions.
+  _solve(coord) {
     if (coord.eof) {
       this.addSolution();
       return true;
@@ -45,14 +50,14 @@ class Sudoku {
 
     // If there's a value, then it came from the inital puzzle.  Skip it.
     if (this.puzzle.getValue(coord)) {
-      return this.solve(nextCell);
+      return this._solve(nextCell);
     }
 
     // Try all 9 possible values
     for (let value = 1; value <= 9; value++) {
       if (this.puzzle.isValid(coord, value)) {
         this.puzzle.setValue(coord, value);
-        if (this.solve(nextCell)) {
+        if (this._solve(nextCell)) {
           if (!this.exhaustive) return true;
         }
       }
@@ -155,9 +160,6 @@ class Puzzle {
 
 require('./puzzleIO').puzzleReader(process.argv.slice(2))
   .then(data => {
-    const sudoku = new Sudoku(data);
-
-    sudoku.solve();
-    sudoku.printSolutions();
+    new Sudoku(data).solve().printSolutions();
   })
   .catch(error => console.log(error));
