@@ -16,11 +16,12 @@ class Sudoku {
     for (let solution of this.solution) {
       solution.print();
     }
+    return this;
   }
 
 
   addSolution() {
-    this.solution.push(new Puzzle(this.puzzle._puzzle));
+    return this.solution.push(new Puzzle(this.puzzle._puzzle));
   }
 
   set exhaustive(value) {
@@ -42,8 +43,7 @@ class Sudoku {
   // The solver.  Recursively tries all possible solutions.
   _solve(coord) {
     if (coord.eof) {
-      this.addSolution();
-      return true;
+      return this.addSolution();
     }
 
     const nextCell = this.puzzle.nextRowCol(coord);
@@ -106,6 +106,7 @@ class Puzzle {
 
   setValue(coord, value) {
     this.puzzle[coord.row][coord.col] = value;
+    return this;
   }
 
   // Functions to convert from 1D index to 2D coords.
