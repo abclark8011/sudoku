@@ -157,9 +157,7 @@ function pr(txt = "", newLine = true) {
   process.stdout.write(txt + (newLine ? "\n" : ""));
 }
 
-require('./puzzleIO').puzzleReader(9 * 9, ['data/2solutions.txt'])
-//require('./puzzleIO').puzzleReader(9 * 9, process.argv.slice(2))
-  .then(data => {
-    new Sudoku(data).solve().printSolutions();
-  })
+//require('./puzzleIO').puzzleReader(9 * 9, ['data/2solutions.txt'])
+require('./puzzleIO').puzzleReader(9 * 9, process.argv.slice(2))
+  .then(data => new Sudoku(data).solve().printSolutions())
   .catch(error => pr(error));
