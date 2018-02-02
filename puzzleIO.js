@@ -5,9 +5,9 @@
 // can call it asynchronously and wait for it complete.
 //
 
-function puzzleReader(args = []) {
+function puzzleReader(numElements = 81, args = []) {
     const promise = new Promise((resolve, reject) => {
-        const data = [];
+        let data = [];
 
         // Default reading from stdin.  If a file name was passed in,
         // then try to open it and read from it instead.
@@ -29,9 +29,19 @@ function puzzleReader(args = []) {
         // Read the data.  Handle lines of data, closing the
         // stream, and errors reading from the stream.
         rl.on('line', (line) => {
-            data.push(line.split('').map(x => Number(x)));
+            // Extract all the characters that are digits and put into array called x,
+            // then append to data
+            let x = line.split('').filter(x => Number(x) !== NaN).map(x => Number(x));
+            Array.prototype.push.apply(data, x);
+            if (data.length === numElements) {
+                rl.close();
+            }
         }).on('close', () => {
-            resolve(data);
+            if (data.length === numElements) {
+                resolve(data);
+            } else {
+                reject(`Too few values entered: expected ${numElements}`);
+            }
         }).on('error', () => {
             reject('Error reading from data file');
         });
@@ -45,4 +55,5 @@ module.exports = {
 };
 
 // Just to test if it works.
-puzzleReader(['data/hardest.txt']);
+//puzzleReader(81, ['data/hardest.txt']).catch(e => console.log(e)); // should work
+//puzzleReader(81, ['puzzleIO.js']).catch(e => console.log(e)); // should fail

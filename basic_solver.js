@@ -9,7 +9,6 @@ class Sudoku {
   constructor(puzzle) {
     this.puzzle = new Puzzle(puzzle);
     this.solution = [];
-    this.exhaustive = true;
   }
 
   printSolutions() {
@@ -19,72 +18,62 @@ class Sudoku {
     return this;
   }
 
-
   addSolution() {
-    return this.solution.push(new Puzzle(this.puzzle._puzzle));
+    // Silly, but we create a scalar array from the cell array, and then
+    // convert back to a cell array to save the solution.  We do this as
+    // a way to do a deep copy.
+    this.solution.push(new Puzzle(this.puzzle._puzzle.map(x => x.value)));
+    return this;
   }
 
-  set exhaustive(value) {
-    if (typeof value !== typeof true) {
-      throw 'expected boolean value';
-    }
-    this._exhaustive = value;
-  }
-
-  get exhaustive() {
-    return this._exhaustive;
-  }
-
-  solve(coord = new RC(0, 0)) {
-      this._solve(coord);
-      return this;
+  getCell(idx) {
+    return this.puzzle.getCell(idx);
   }
 
   // The solver.  Recursively tries all possible solutions.
-  _solve(coord) {
-    if (coord.eof) {
+  solve(idx = 0) {
+    if (idx >= 9 * 9) {
       return this.addSolution();
     }
 
-    const nextCell = this.puzzle.nextRowCol(coord);
+    let cell = this.getCell(idx);
+    let origValue = cell.value;
 
     // If there's a value, then it came from the inital puzzle.  Skip it.
-    if (this.puzzle.getValue(coord)) {
-      return this._solve(nextCell);
+    if (origValue > 0) {
+      return this.solve(idx + 1);
     }
 
     // Try all 9 possible values
     for (let value = 1; value <= 9; value++) {
-      if (this.puzzle.isValid(coord, value)) {
-        this.puzzle.setValue(coord, value);
-        if (this._solve(nextCell)) {
-          if (!this.exhaustive) return true;
-        }
+      if (this.puzzle.isValid(cell, value)) {
+        cell.value = value;
+        this.solve(idx + 1);
       }
     }
-    this.puzzle.setValue(coord, 0); // Restore original value
-    return false;
+    cell.value = 0; // Restore original value
+    return this;
   }
 }
 
-
-class Coord {
-  constructor(row, col) {
-    this.row = row;
-    this.col = col;
+class Cell {
+  constructor(value) {
+    this.value = value;
+    this.row = this.col = this.block = [];
   }
-}
 
-class RC extends Coord { // Row/Column coordinate class
-  constructor(row, col) {
-    super(row, col);
-    this.eof = row < 0 || row >=9 || col < 0 || col >= 9;
+  getValue() {
+    return this.value;
   }
 }
 
 class Puzzle {
-  constructor(puzzle = [[]]) {
+  constructor(puzzle = []) {
     this.puzzle = puzzle;
+  }
+
+  getCell(idx) {
+    return this._puzzle[idx];
   }
 
   get puzzle() {
@@ -92,74 +81,91 @@ class Puzzle {
   }
 
   set puzzle(data) {
-    this._puzzle = [data.length];
-    for (let i = 0; i < data.length; i++) {
-      this._puzzle[i] = data[i].slice();
+    this._puzzle = data.map(x => new Cell(x));
+    this.initRowsColsBlocks();
+    this.assignCellsToRowColBlock();
+    this.dump();
+  }
+
+  dump() {
+    function p(cell) {
+      process.stdout.write(cell.getValue().toString());
     }
-    this.ROWS = this.puzzle.length;
-    this.COLS = this.puzzle[0].length;
+    function pr(txt = "") {
+      console.log(txt);
+    }
+
+    pr("Data:");
+    this.print();
+    pr("Rows:");
+    this.rows.map(row => { row.map(cell => p(cell)); pr() });
+    pr("Cols:");
+    this.cols.map(col => { col.map(cell => p(cell)); pr() });
+    pr("Blocks:");
+    this.blocks.map(block => { block.map(cell => p(cell)); pr() });
   }
 
-  getValue(coord) {
-    return this.puzzle[coord.row][coord.col];
+  assignCellsToRowColBlock() {
+    this.rows.map  (row   => row.map  (x => x.row   = row));
+    this.cols.map  (col   => col.map  (x => x.col   = col));
+    this.blocks.map(block => block.map(x => x.block = block));
   }
 
-  setValue(coord, value) {
-    this.puzzle[coord.row][coord.col] = value;
-    return this;
-  }
-
-  // Functions to convert from 1D index to 2D coords.
-  // Used to traverse all cells in a block.
-  row2D(id, offset)  {
-    return 3 * Math.floor(id / 3) + Math.floor(offset / 3);
-  }
-
-  col2D(id, offset) {
-    return 3 * Math.floor(id / 3) + offset % 3;
-  }
-
-  // Calulcate the next row and column
-  nextRow(coord)  {
-    return Math.floor((9 * coord.row + coord.col + 1) / 9);
-  }
-
-  nextCol(coord)  {
-    return (9 * coord.row + coord.col + 1) % 9;
-  }
-
-  nextRowCol(coord) {
-    return new RC(this.nextRow(coord), this.nextCol(coord));
+  // Create 9 rows, 9 cols, 9 blocks that point to
+  // the cells in them.
+  initRowsColsBlocks() {
+    this.rows = []; this.cols = []; this.blocks = [];
+    // Rows
+    for (let i = 0; i < 9; i++) {
+      this.rows.push(this._puzzle.slice(i * 9, i * 9 + 9))
+    }
+    // Cols
+    for (let i = 0; i < 9; i++) {
+      let x = [];
+      for (let j = 0; j < 9; j++) {
+        x.push(this._puzzle[j * 9 + i]);
+      }
+      this.cols.push(x);
+    }
+    // Blocks
+    for (let i = 0; i < 9; i++) {
+      let x = [];
+      let row = Math.floor(i / 3) * 3;
+      let col = i % 3 * 3;
+      for (let j = row; j < row + 3; j++) {
+        for (let k = col; k < col + 3; k++) {
+          x.push(this.rows[j][k]);
+        }
+      }
+      this.blocks.push(x);
+    }
   }
 
   // Given a possible value for a row/col location, check if
   // that value will violate the basic Sudoku rules.
-  isValid(coord, value) {
-    for (let i = 0; i < this.ROWS; i++) {
-      let c = new RC(coord.row, i);
-      if (this.getValue(c) === value) return false;
-      c = new RC(i, coord.col);
-      if (this.getValue(c) === value) return false;
-      c = new RC(this.row2D(coord.row, i), this.col2D(coord.col, i));
-      if (this.getValue(c) === value) return false;
-    }
+  isValid(cell, value) {
+    var contains = (array, value) => array.find(x => x.value === value) !== undefined;
+    if (contains(cell.row, value)) return false;
+    if (contains(cell.col, value)) return false;
+    if (contains(cell.block, value)) return false;
     return true;
   }
 
   // Function to print out the puzzle.
   print() {
-    for (let i = 0; i < this.ROWS; i++) {
-      for (let j = 0; j < this.COLS; j++) {
-        const coord = new RC(i, j);
-        process.stdout.write(this.getValue(coord).toString());
+    let i = 0;
+    for (let cell of this._puzzle) {
+      process.stdout.write(cell.getValue().toString());
+      if (++i % 9 === 0) {
+        console.log("");
       }
-      console.log("");
     }
     console.log("");
   }
 }
 
-require('./puzzleIO').puzzleReader(process.argv.slice(2))
+require('./puzzleIO').puzzleReader(9 * 9, ['data/2solutions.txt'])
+//require('./puzzleIO').puzzleReader(9 * 9, process.argv.slice(2))
   .then(data => {
     new Sudoku(data).solve().printSolutions();
   })
