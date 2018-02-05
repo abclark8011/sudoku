@@ -1,4 +1,4 @@
-// Read lines of numbers and return a 2D array of the data.
+// Read lines of numbers and return an array of the data.
 // The caller must deal with bad input (e.g. too much/little data).
 //
 // This module creates a Promise object, so that the caller
@@ -32,8 +32,9 @@ function puzzleReader(numElements = 81, args = []) {
             // Extract all the characters that are digits and put into array called x,
             // then append to data
             let x = line.split('').filter(x => Number(x) !== NaN).map(x => Number(x));
-            Array.prototype.push.apply(data, x);
-            if (data.length === numElements) {
+            //Array.prototype.push.apply(data, x);
+            x.map(i => data.push(i));
+            if (data.length >= numElements) {
                 rl.close();
             }
         }).on('close', () => {
