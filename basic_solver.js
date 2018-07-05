@@ -152,7 +152,7 @@ class Puzzle {
 // Create a range method for ourselves since JS doesn't have one (yet).
 Array.range = (i, j) => Array.from(new Array(j - i + 1), (val, idx) => i + idx);
 
-// Helper function for printing!
+// Helper function for printing.
 function pr(txt = "", newLine = true) {
   process.stdout.write(txt + (newLine ? "\n" : ""));
 }
